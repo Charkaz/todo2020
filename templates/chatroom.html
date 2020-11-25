@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %} chat {% endblock  %}
+
+
+{% block govde %}
+<br><br><br><br>
+<div class="offset-md-5" >
+    <h2>Todo Chat</h2>
+      </div>
+ <hr>
+ <div class="container">
+   <div class="row">
+    <div class="col-md-5 offset-md-3">
+        <div class="form-group">
+            <textarea class="form-control" id="chat-log"  rows="10"></textarea>
+        </div>
+        <div class="form-group">
+            <input id="chat-message-input" type="text" class="form-control"  size="100">
+        </div>
+        <div class="form-group">
+            <input id="chat-message-submit" type="button"  class="form-control btn btn-success"  value="YAZ">
+        </div>    
+            <input id="chat-author-input"  value="{{request.user}}" type="hidden" class="form-control"  size="100">
+            <input id="chat-todo-input"  value="{{room_name}}" type="hidden" class="form-control"  size="100">
+       
+    </div>
+   </div>
+ </div>
+
+
+{{ room_name|json_script:"room-name" }}
+
+<script>
+const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+const chatSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/chat/'
+    + roomName
+    + '/'
+);
+
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    document.querySelector('#chat-log').value += (data.author+ "\t: "+data.message + '\n');
+};
+
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+};
+
+document.querySelector('#chat-message-input').focus();
+document.querySelector('#chat-message-input').onkeyup = function(e) {
+    if (e.keyCode === 13) {  // enter, return
+        document.querySelector('#chat-message-submit').click();
+    }
+};
+
+document.querySelector('#chat-message-submit').onclick = function(e) {
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const messageAuthorDom = document.querySelector('#chat-author-input');
+    const messageTodoDom = document.querySelector('#chat-todo-input');
+    const message = messageInputDom.value;
+    const author  = messageAuthorDom.value
+    const todo    = messageTodoDom.value
+    chatSocket.send(JSON.stringify({
+        'message': message,
+        'author':author,
+        'todo':todo,
+    }));
+    messageInputDom.value = '';
+};
+</script>
+
+{% endblock %}

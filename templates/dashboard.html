@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %} Dashboard {% endblock %}
+
+
+
+{% block govde %}
+    <br><br><br>
+    {% include 'mesaj.html' %}
+   <div class="header offset-md-5" >
+       <h2>Todo Siyahisi</h2>
+         </div>
+    <hr>
+<div class="container">
+
+    <div class="row">
+      {% for todo in paylasilanlar %}
+      <div class="col-md-3">
+        <div style="margin-top: 20px;" class="card-deck">
+            <div class="card">
+              <img class="card-img-top" src="https://image.freepik.com/free-vector/people-making-list-illustration_53876-43029.jpg" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">{{todo.todom.basliq}}</h5>
+                <a href="{% url 'tododetail' todo.todom.id %}"><p class="card-text">{{todo.todom.aciqlama|truncatechars:35 }}</p></a>
+              </div>
+              <div class="card-footer">
+                <small  class="text badge badge-secondary" class="text-muted">{{todo.todom.yaranma_tarix|timesince}} əvvəl</small>
+                <small  class="text badge badge-success" class="text-muted">{{todo.todom.bitme_tarixi}} bitəcək</small>
+              
+                {% if todo.todom.useri == request.user %}
+                <small class="text badge badge-info">{{todo.todom.useri.username}}</small>
+                {% else %}
+                <small class="text badge badge-primary">{{todo.todom.useri.username}}</small>
+                {% endif %}
+              </div>
+            </div>  
+          </div>
+    </div>
+      {% endfor %}
+  </div>
+</div>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Yeni Todo Yarad</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{% url 'todoqeyd' %}" method="POST">
+        {% csrf_token %}
+      <div class="modal-body">
+        {{form}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Bagla</button>
+        <button type="submit" class="btn btn-primary">Yarad</button>
+      </div>
+    </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade " id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Todo Istekleri</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Paylasan</th>
+            <th scope="col">Todo basliq</th>
+            <th scope="col">Yaranma vaxti</th>
+            <th scope="col">Bitme vaxti</th>
+            <th scope="col">Qebul et</th>
+            <th scope="col">sil</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+        
+          {% for gozleyen in paylasilan_todolar_gozleyenler %}
+          <tr>
+          <th scope="row">{{gozleyen.id}}</th>
+          <td>{{gozleyen.paylasan_id.username}}</td>
+          <td>{{gozleyen.todom.basliq}}</td>
+          <td>{{gozleyen.todom.yaranma_tarix}}</td>
+          <td>{{gozleyen.todom.bitme_tarixi}}</td>
+          <td><a href="{% url 'istekqebul' gozleyen.id %}" class="btn btn-success btn-sm">Qebul et</a></td>
+          <td><a href="{% url 'isteksil' gozleyen.id %}" class="btn btn-danger btn-sm">Sil</a></td>
+        </tr>
+
+          {% endfor %}
+       
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

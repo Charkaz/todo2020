@@ -1,0 +1,10 @@
+{% if messages %}
+<div style="margin-top: 40px;" class="col-lg-8 col-offset-3">
+    {% for message in messages %}
+    <div  class="alert-dismissible alert alert-{% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <p>{{message|safe}}</p>
+     </div>
+    {% endfor %}
+</div>
+{% endif %}

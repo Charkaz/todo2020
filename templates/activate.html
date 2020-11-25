@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title  %} Profili aktivlesdirmek {% endblock %}
+
+{% block govde %}
+<br><br><br>
+
+<div class="container">
+<div class="row">
+    <div class="col-md-5 offset-md-4">
+        <div class="card">
+            <div class="card-header">
+                <span>Zehmet olmasa activlesdirme kodunu yazin:</span>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'activate' %}" method="POST">
+                    {% csrf_token %}
+               <div class="form-group">
+                <span>{{form}}</span>
+               </div>
+               <div class="form--group">
+                   <button type="submit" class="btn btn-success btn-md pull-center">Aktiv et</button>
+               </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}

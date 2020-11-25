@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %} Todo {% endblock %}
+{% block elave %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready(function(){
+      $('#user').select2()
+  });
+</script>
+{% endblock %}
+
+
+{% block govde %}
+<br><br><br>
+<div class="offset-5"> 
+    <H2>Todo haqqinda</H2>
+</div>
+<hr>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div style="margin-top: 20px;" class="card-deck">
+                <div class="card">
+                  <img class="card-img-top" src="https://image.freepik.com/free-vector/young-people-smiling-blue-background_18591-52399.jpg" alt="Card image cap">
+                  <div class="card-body">
+                    <h5 class="card-title">{{todom.basliq}}</h5>
+                    <p class="card-text">{{todom.aciqlama }}</p>
+                  </div>
+                  <div class="card-footer">
+                    <small class="text-muted">{{todom.yaranma_tarix|timesince}}</small>
+                  </div>
+                </div>  
+              </div>
+        </div>
+        <div class="col-md-6">
+            <div style="margin-top: 20px;" class="card-deck">
+                <div class="card">
+                 <div class="card-body">
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Parametrler</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Reyler</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Paylas</a>
+                        </li>
+                      </ul>
+                      <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                        {% if todom.useri == request.user %}
+                          <form action="{% url 'todoupdate' todom.id %}" method="POST">
+                            {% csrf_token %}
+                        <div class="form-group">
+                            <label for="">Basliq</label>
+                            <input type="text" name="basliq" id="basliq" value="{{todom.basliq}}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Basliq</label>
+                            <textarea  name="aciqlama" id="aciqlama"  class="form-control">{{todom.aciqlama}}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Son Tarix</label>
+                            <input type="datetime-local" name="son_tarix" id="son_tarix" value="{{todom.basliq}}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Tenzimle</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <img src="https://image.freepik.com/free-vector/error-404-concept-landing-page_52683-18367.jpg" class="img-fluid" alt="tenzimleme mumkun deyil">
+                    {% endif %}
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+
+                          <div class="card">
+                            <div class="card-header">
+                              Bu todo ucun olan serhler
+                            </div>
+                            <div class="card-body">
+                              <div class="container">
+                                {% for serh in serhler %}
+                                <div class="row">
+                                  <div class="col-md-2">
+                                    <img src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" style="height: 50px;" class="img-responsive">
+                                  </div>
+                                  <div class="col-md-10">
+                                    <h5><span class="badge badge-info">{{serh.metin}}<small class="badge badge-light">{{serh.useri}}</small></span></h5>
+                                    <small class="badge badge-success">{{serh.tarix}}</small>
+                                    {% if todom.useri == request.user %}
+                                    <a href="{% url 'serhsil' serh.id %}" class="badge badge-danger">sil</a> 
+                                     {% if serh.useri == request.user %}
+                                     <a href="{% url 'serhupdate' serh.id %}" class="badge badge-secondary">Tenzimle</a> 
+                                 
+                                     {% endif %}
+                                    {% elif serh.useri == request.user  %}
+                                    <a href="{% url 'serhsil' serh.id %}" class="badge badge-danger">Sil</a> 
+                                    <a href="{% url 'serhupdate' serh.id %}" class="badge badge-secondary">Tenzimle</a> 
+                                    {% endif %}
+                                  </div>
+                                </div>
+                                <hr>
+                                {% endfor %}
+                              </div>
+                              {% if icaze.rey_icaze %}
+                              <a href="{% url 'room' todom.id %}" class=" col btn btn-primary" >Serh yaz</a>
+                              {% endif %}
+                              </div>
+                             
+                          </div>
+
+          
+
+                        </div>
+                        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                          <form action="{% url 'paylas' todom.id %}" method="POST">
+                            {% csrf_token %}
+                          <div class="form-group" >
+                            <select name="user" id="user" class="col" style="width: 300px;">
+                              <option selected>---Istifadeci---</option>
+                              {% for user in users %}
+                                {% if not request.user == user %}
+                                 <option value="{{user.id}}">{{user.username}}</option> 
+                                 {% endif %}
+                              {% endfor %}
+                            </select>
+                            
+                          </div>
+                          <div class="form-group">
+                            
+                            <div class="col-sm-10">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="icaze" name="icaze">
+                                <label class="form-check-label" for="gridCheck1">
+                                  serh yazmaga icaze
+                                </label>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <hr>
+                              <button type="submit" class="btn btn-primary offset-5">Paylas</button>
+                            </div>
+                          </form>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>  
+              </div>
+        </div>
+    </div>
+</div>
+
+<!--Model-->
+
+
+{% block jquery %}
+
+{% endblock %}
+{% endblock %}
